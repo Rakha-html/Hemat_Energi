@@ -3,6 +3,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const navLinks = document.getElementById("nav-links");
   const navbar = document.getElementById("navbar");
   const navItems = document.querySelectorAll(".nav-item");
+  const themeToggleBtn = document.getElementById("theme-toggle");
+
+  // Theme Toggle Functionality
+  function updateThemeAria(theme) {
+    if (!themeToggleBtn) return;
+    const isDark = theme === "dark";
+    const newLabel = isDark ? "Beralih ke Mode Terang" : "Beralih ke Mode Gelap";
+    themeToggleBtn.setAttribute("aria-label", newLabel);
+    themeToggleBtn.setAttribute("title", newLabel);
+  }
+
+  // Set initial aria label based on current active theme
+  const initialTheme = document.documentElement.getAttribute("data-theme") || "light";
+  updateThemeAria(initialTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const targetTheme = currentTheme === "dark" ? "light" : "dark";
+
+      document.documentElement.setAttribute("data-theme", targetTheme);
+      localStorage.setItem("theme", targetTheme);
+      updateThemeAria(targetTheme);
+    });
+  }
+
+  // Listen for system color-scheme changes if user has no saved preference
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+      if (!localStorage.getItem("theme")) {
+        const autoTheme = e.matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", autoTheme);
+        updateThemeAria(autoTheme);
+      }
+    });
+  }
 
   if (hamburgerBtn && navLinks) {
     hamburgerBtn.addEventListener("click", () => {
